@@ -1,0 +1,2 @@
+INDEX VERSION 1.126+/Users/nickporter/SkyDrive/AP Computer Science/workspace/.metadata/.plugins/org.eclipse.jdt.core
+2703700648.index

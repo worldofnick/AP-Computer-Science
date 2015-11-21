@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename type &apos;StackDouble&apos; to &apos;Stack&apos;&#x0A;- Original project: &apos;Stack&apos;&#x0A;- Original element: &apos;StackDouble&apos;&#x0A;- Renamed element: &apos;Stack&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" description="Rename type &apos;StackDouble&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src&lt;{StackDouble.java[StackDouble" matchStrategy="1" name="Stack" qualified="false" references="true" similarDeclarations="false" stamp="1394054689471" textual="false" version="1.0"/>
+</session>

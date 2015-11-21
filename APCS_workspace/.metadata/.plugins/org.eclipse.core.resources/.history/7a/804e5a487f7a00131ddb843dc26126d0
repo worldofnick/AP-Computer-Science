@@ -1,0 +1,233 @@
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
+
+public class Cell {
+	// Nick Porter
+	private String cellStringValue;
+	// True == String, False == Numeric
+	private boolean dataType;
+	private double mathValue;
+	private String formula;
+	private int cellWidth = 12;
+	private boolean cellInFormula;
+	
+	Cell() {
+		setCellStringValue("");
+		dataType = true;
+	}
+	
+	
+	public String getCellStringValue() {
+		return cellStringValue;
+	}
+	
+	public String getMathValue() {
+		return Double.toString(mathValue);
+	}
+
+	public void setCellStringValue(String cellStringValue) {
+		this.cellStringValue = cellStringValue;
+		dataType = true;
+	}
+	
+	public void setCellNumericValue(String cellStringValue) {
+		boolean operators = checkForOperators(cellStringValue);
+		this.cellStringValue = cellStringValue;
+		
+		if (operators) {
+			Queue<Token> outputQueue = shuntingYard(cellStringValue);
+			mathValue = calcReversedPolished(outputQueue);
+			dataType = false;
+		} else {
+			this.mathValue = Double.parseDouble(cellStringValue);
+		}
+
+	}
+	
+	/*
+	 * Converts the string into reversed polish notation.
+	 */
+	private static Queue<Token> shuntingYard(String input) {
+		String[] inputArray = input.split(" ");
+		Token[] inputTokenized = new Token[inputArray.length];
+		
+		for (int i = 0; i < inputArray.length; i++) {
+			inputTokenized[i] = new Token();
+			inputTokenized[i].stringToToken(inputArray[i]);
+		}
+		54
+		Queue<Token> outputQueue = new LinkedList<Token>();
+		Stack<Token> operatorStack = new Stack<Token>();
+		
+		int index = 0;
+		while (index < inputTokenized.length) {
+			
+			if (inputTokenized[index].getTokenType() == Token.TokenType.Number) {
+				outputQueue.add(inputTokenized[index]);
+				
+			} else if(inputTokenized[index].getTokenType() == Token.TokenType.LeftBrace) {
+				operatorStack.push(inputTokenized[index]);
+						
+			} else if(inputTokenized[index].getTokenType() == Token.TokenType.RightBrace) {
+				// Pops all operators to output queue until it finds the matching brace.
+				// Then discards matching braces.
+				while (operatorStack.peek().getTokenType() != Token.TokenType.LeftBrace) {
+					outputQueue.add(operatorStack.pop());
+				}
+				operatorStack.pop();
+				
+			} else if(inputTokenized[index].getTokenType() == Token.TokenType.Operator) {
+				
+				// Adds the first operator, doesn't check for others.
+				if (operatorStack.isEmpty()) {
+					operatorStack.push(inputTokenized[index]);
+				} else {
+					
+					Token o2 = operatorStack.peek();
+					
+					if (inputTokenized[index].getAssoc() == Token.Associtivity.Left && 
+							inputTokenized[index].getPrecedence() == o2.getPrecedence() || 
+							inputTokenized[index].getPrecedence() < o2.getPrecedence()) {
+						
+						outputQueue.add(o2);
+						operatorStack.push(inputTokenized[index]);
+					} else {
+						operatorStack.push(inputTokenized[index]);
+					}
+				}
+				
+			} 
+			
+			index++;
+		}
+		// Adds the rest of the operators to the queue.
+		while (!operatorStack.isEmpty()) {
+			// This prints the correct symbol, but when popped doesn't work.
+			outputQueue.add(operatorStack.pop());
+		}
+		
+		return outputQueue;
+	}
+	
+	private static double calcReversedPolished(Queue<Token> outputQueue) {
+		Queue<Token>outputQueueHolder = outputQueue;
+		Stack <Double> resultStack = new Stack <Double>();
+		int index = 0;
+		
+		while (!outputQueue.isEmpty()) {
+			
+			if (outputQueue.peek().getTokenType() == Token.TokenType.Number) {
+				resultStack.push(outputQueue.remove().getValue());
+				
+			} else if(outputQueue.peek().getTokenType() == Token.TokenType.Operator) {
+				
+				char operator = outputQueue.remove().getSymbol();
+				double secondRemoved = resultStack.pop();
+				double firstRemoved = resultStack.pop();
+				
+				
+				switch (operator) {
+				case '+':
+					resultStack.push(firstRemoved + secondRemoved);
+					break;
+				case '-':
+					resultStack.push(firstRemoved - secondRemoved);
+					break;
+				case '/':
+					resultStack.push(firstRemoved / secondRemoved);
+					break;
+				case '*':
+					resultStack.push(firstRemoved * secondRemoved);
+					break;
+
+				default:
+					break;
+				}
+					
+			}
+			
+			if (resultStack.size() == 1 && index > 2 || resultStack.size() == 1 && outputQueueHolder.size() <= 3 && index > 1 ) {
+				return resultStack.pop();
+			}
+			index++;
+		}
+		return 0;
+				
+	}
+	
+	 //If any of the tokens in the string are an operator it returns true. 
+	public boolean checkForOperators(String cellValue) {
+		String[] operatorArray = {"+", "-", "/", "*"};
+		String[] tokens = cellValue.split(" ");
+		
+		for (int i = 0; i < tokens.length; i++) {
+			for (int j = 0; j < operatorArray.length; j++) {
+				if (tokens[i].equals(operatorArray[j])) {
+					return true;
+				}
+			}
+		}
+		return false;
+			
+	}
+	// This method adds n amount of spaces to the left side of the string.
+	public String padLeft(int n) {
+		if (dataType) {
+			return String.format("%1$" + n + "s", cellStringValue);
+		} else {
+			String roundedValue = String.format("%.2f", mathValue);
+			return String.format("%1$" + n + "s", roundedValue);
+		} 
+	}
+	
+	
+	public int getCellWidth() {
+		return cellWidth;
+	}
+
+
+	public void setCellWidth(int cellWidth) {
+		this.cellWidth = cellWidth;
+	}
+
+
+	public String toString() {
+		if (dataType) {
+			return cellStringValue;
+		} else {
+			return Double.toString(Math.round(mathValue));
+		}
+		
+	}
+
+	public String getFormula() {
+		return formula;
+	}
+
+
+	public void setFormula(String formula) {
+		this.formula = formula;
+	}
+
+
+	public boolean isCellInFormula() {
+		return cellInFormula;
+	}
+
+
+	public void setCellInFormula(boolean cellInFormula) {
+		this.cellInFormula = cellInFormula;
+	}
+
+
+	public boolean isDataType() {
+		return dataType;
+	}
+
+
+	public void setDataType(boolean dataType) {
+		this.dataType = dataType;
+	}
+		
+}

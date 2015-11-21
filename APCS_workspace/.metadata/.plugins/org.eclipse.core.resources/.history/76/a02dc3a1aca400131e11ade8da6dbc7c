@@ -1,0 +1,72 @@
+
+public class StackMain {
+
+	public static void main(String[] args) {
+		StackDouble stack = new StackDouble();
+		String equation = "5 1 2 + 4 * + 3 -";
+		String[] splitEquation = equation.split(" ");
+		
+		// Fill Stack
+		for(String s : splitEquation) {
+			stack.push(s);
+		}
+
+		// Math
+		String result = postfix(stack);
+		//System.out.println(result);
+		
+	}
+	
+	private static String postfix(StackDouble stack) {
+		StackDouble outputStack = new StackDouble();
+		
+		while(!stack.isEmpty()) {
+			if (isNumeric(stack.peek())) {
+				outputStack.push(stack.pop());
+			} else {
+				// Assume anything else is an operator.
+				String operator = stack.pop();
+				double secondRemoved = Integer.parseInt(stack.pop());
+				double firstRemoved = Integer.parseInt(stack.pop());
+				
+				switch (operator) {
+				case "+":
+					outputStack.push(Double.toString(firstRemoved + secondRemoved));
+					break;
+				case "-":
+					outputStack.push(Double.toString(firstRemoved - secondRemoved));
+					break;
+				case "/":
+					outputStack.push(Double.toString(firstRemoved / secondRemoved));
+					break;
+				case "*":
+					outputStack.push(Double.toString(firstRemoved * secondRemoved));
+					break;
+
+				default:
+					break;
+				}
+				
+				if (outputStack.getSize() == 1 && outputStack.isEmpty()) {
+					return outputStack.pop();
+				}	
+			}
+		}
+		return "Error";
+	}
+	
+	public static boolean isNumeric(String str)  
+	{  
+	  try  
+	  {  
+	    double d = Double.parseDouble(str);  
+	  }  
+	  catch(NumberFormatException nfe)  
+	  {  
+	    return false;  
+	  }  
+	  return true;  
+	}
+
+
+}

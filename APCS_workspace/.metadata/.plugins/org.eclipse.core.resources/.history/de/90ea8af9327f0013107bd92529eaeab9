@@ -1,0 +1,131 @@
+package newSorter;
+
+import java.util.Date;
+import java.util.Random;
+
+public class Sorter1 {
+	private int[] numberArray;
+	private int filledToIndex;
+	private long startingTime;
+	private long endingTime;
+	private long elapsedTime;
+	
+	public Sorter1(int arraySize) {
+		// Add 3 spaces to allow 3 inserts
+		this.numberArray = new int[arraySize + 3];
+		// This is the highest index that has a value.
+		filledToIndex = arraySize - 1;
+		
+		Random r = new Random();
+		for (int i = 0; i < this.numberArray.length; i++) {
+			this.numberArray[i] = r.nextInt(arraySize);
+		}
+	}
+	
+	public void takeInput(String s) {
+		String[] stringToken = s.split(" ");
+		
+		switch (stringToken[0]) {
+		case "print":
+			print();
+			break;
+			
+		case "delete":
+			delete(stringToken[1]);
+			break;
+			
+		case "insert":
+			insert(stringToken[1], stringToken[2]);
+			break;
+
+		default:
+			break;
+		}
+	}
+	
+	public void print() {
+		/*
+		 * If the array is over 50 then it prints the first 15 indexs and the last 15.
+		 */
+		if (this.numberArray.length > 50) {
+			System.out.println("Size: " + this.filledToIndex);
+			for (int i = 0; i <= 15; i++) {
+				System.out.printf("%d\t%d\n", i, numberArray[i]);
+			}
+			System.out.println("...");
+			for (int i = numberArray.length - 15; i <= filledToIndex; i++) {
+				System.out.printf("%d\t%d\n", i, numberArray[i]);
+			}
+			
+		} else {
+			System.out.println("Size: " + this.filledToIndex);
+			for (int i = 0; i <= filledToIndex; i++) {
+				System.out.printf("%d\t%d\n", i, numberArray[i]);
+			}
+		}
+	}
+	
+	public void delete(String indexToRemove) {
+		startTimer();
+		int indexRemove = 0;
+		try {
+			indexRemove = Integer.parseInt(indexToRemove);
+		} catch (NumberFormatException e) {
+			System.out.println("Enter a valid index in the array.");
+		}
+		
+		for (int i = indexRemove; i < filledToIndex + 1; i++) {
+			this.numberArray[i] = this.numberArray[i + 1];
+		}
+		
+		stopTimer();	
+	}
+	
+	public void insert(String index, String value) {
+		startTimer();
+		int insertIndex = 0;
+		int insertValue = 0;
+		
+		try {
+			insertIndex = Integer.parseInt(index);
+		} catch (NumberFormatException e) {
+			System.out.println("Enter a valid index in the array.");
+		}
+		
+		try {
+			insertValue = Integer.parseInt(value);
+		} catch (NumberFormatException e) {
+			System.out.println("Enter a valid index in the array.");
+		}
+		
+		if(insertValue > this.numberArray.length || insertValue < 0) {
+			System.out.println("Please enter a number equal to or less than your array length and greater than - 1");
+		} else if(this.filledToIndex == this.numberArray.length) {
+			System.out.println("Your array is full, please remove a number to add more");
+		}
+		
+		for (int i = this.filledToIndex; i >= insertIndex; i--) {
+			this.numberArray[i + 1] = this.numberArray[i];
+		}
+		
+		/*
+		 * I thought about doing by using a stack to hold the values, insert the value then re-insert the held values one index higher.
+		 * But this method was more straight forward in my mind.
+		 */
+		
+		this.numberArray[insertIndex] = insertValue;
+		this.filledToIndex++;
+		stopTimer();
+	}
+	
+	private void startTimer() {
+		this.startingTime = new Date().getTime();
+	}
+	
+	private void stopTimer() {
+		this.endingTime = new Date().getTime();
+		this.elapsedTime = this.endingTime - this.startingTime;
+		System.out.printf("Elapsed time: \t%d miliseconds.\n", this.elapsedTime);
+	}
+	
+}
